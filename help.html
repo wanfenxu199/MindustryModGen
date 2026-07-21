@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模组制作帮助</title>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0f0f1a;
+            color: #e0e0e0;
+            padding: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        h1 {
+            color: #e67e22;
+            border-bottom: 2px solid #e67e22;
+            padding-bottom: 10px;
+            font-size: 22px;
+        }
+        h2 {
+            color: #e67e22;
+            margin-top: 30px;
+            font-size: 18px;
+            border-left: 3px solid #e67e22;
+            padding-left: 12px;
+        }
+        h3 {
+            color: #f1c40f;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .field {
+            color: #FFD700;
+        }
+        .value {
+            color: #5dade2;
+        }
+        .desc {
+            color: #888888;
+            font-size: 13px;
+        }
+        .example {
+            background: #1a1a2e;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #e67e22;
+            font-size: 13px;
+        }
+        .example .field {
+            color: #FFD700;
+        }
+        .example .value {
+            color: #5dade2;
+        }
+        .tag {
+            display: inline-block;
+            background: #2a2a44;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #e67e22;
+        }
+        hr {
+            border: 1px solid #2a2a44;
+            margin: 20px 0;
+        }
+        .tip {
+            background: #1a2e1a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid #27ae60;
+            margin: 12px 0;
+        }
+        .warning {
+            background: #2e1a1a;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-left: 3px solid #c0392b;
+            margin: 12px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 13px;
+        }
+        th {
+            background: #2a2a44;
+            color: #e67e22;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        td {
+            padding: 6px 12px;
+            border-bottom: 1px solid #1a1a2e;
+        }
+        .badge {
+            background: #e67e22;
+            color: #fff;
+            padding: 0 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+</style>
+  </head>
+  <body>
+
+    <h1>📦 Mindustry 模组制作帮助</h1>
+
+    <!-- ========== 快速开始 ========== -->
+    <h2>🚀 快速开始</h2>
+    <hr>
+    <p>1. 填写模组基本信息（名称、作者、版本等）</p>
+    <p>2. 选择内容类型（炮塔/物品/方块/单位等）</p>
+    <p>3. 添加自定义字段</p>
+    <p>4. 点击「生成模组文件」</p>
+    <p>5. 可选：点击「打包 ZIP」导入游戏</p>
+
+    <div class="tip">
+      💡 <b>提示：</b>字段名和值请参考下方各类型的参数说明
+    </div>
+
+    <!-- ========== 炮塔 ========== -->
+    <h2>🎯 炮塔 (Turret)</h2>
+    <hr>
+
+    <h3>ItemTurret - 物品炮塔</h3>
+    <div class="example">
+      <span class="field">type</span>: <span class="value">"ItemTurret"</span><br>
+      <span class="field">name</span>: <span class="value">"炮塔名称"</span><br>
+      <span class="field">health</span>: <span class="value">800</span><br>
+      <span class="field">size</span>: <span class="value">2</span>  <span class="desc">// 占地面积 1-5</span><br>
+      <span class="field">range</span>: <span class="value">20</span>  <span class="desc">// 射程</span><br>
+      <span class="field">reload</span>: <span class="value">10</span>  <span class="desc">// 装填时间（越小越快）</span><br>
+      <span class="field">shootCone</span>: <span class="value">30</span>  <span class="desc">// 射击角度</span><br>
+      <span class="field">shots</span>: <span class="value">1</span>  <span class="desc">// 每次射击弹丸数</span><br>
+      <span class="field">shootWarmup</span>: <span class="value">0</span>  <span class="desc">// 预热时间</span><br>
+      <span class="field">ammoType</span>: <span class="value">"弹药类型"</span><br>
+      <span class="field">ammoPerShot</span>: <span class="value">1</span><br>
+      <span class="field">buildCost</span>: <span class="value">{"copper": 100, "lead": 50}</span>  <span class="desc">// 建造费用</span>
+    </div>
+
+    <h3>DoubleTurret - 双管炮塔</h3>
+    <div class="example">
+      <span class="field">type</span>: <span class="value">"DoubleTurret"</span><br>
+      <span class="field">name</span>: <span class="value">"双管炮塔"</span><br>
+      <span class="field">health</span>: <span class="value">1000</span><br>
+      <span class="field">size</span>: <span class="value">3</span><br>
+      <span class="field">range</span>: <span class="value">22</span><br>
+      <span class="field">reload</span>: <span class="value">8</span><br>
+      <span class="field">shots</span>: <span class="value">2</span>  <span class="desc">// 双管</span>
+    </div>
+
+    <h3>LaserTurret - 激光炮塔</h3>
+    <div class="example">
+      <span class="field">type</span>: <span class="value">"LaserTurret"</span><br>
+      <span class="field">name</span>: <span class="value">"激光炮塔"</span><br>
+      <span class="field">health</span>: <span class="value">600</span><br>
+      <span class="field">size</span>: <span class="value">2</span><br>
+      <span class="field">range</span>: <span class="value">15</span><br>
+      <span class="field">reload</span>: <span class="value">20</span><br>
+      <span class="field">damage</span>: <span class="value">10</span>  <span class="desc">// 每秒伤害</span>
+    </div>
+
+    <!-- ========== 炮塔参数表 ========== -->
+    <h3>📋 炮塔常用参数</h3>
+    <table>
+      <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+      <tr><td><span class="field">health</span></td><td>数字</td><td>血量值</td></tr>
+      <tr><td><span class="field">size</span></td><td>数字</td><td>占地面积 (1-5)</td></tr>
+      <tr><td><span class="field">range</span></td><td>数字</td><td>攻击范围</td></tr>
+      <tr><td><span class="field">reload</span></td><td>数字</td><td>装填时间 (越小越快)</td></tr>
+      <tr><td><span class="field">shots</span></td><td>数字</td><td>每次射击弹丸数</td></tr>
+      <tr><td><span class="field">shootCone</span></td><td>数字</td><td>射击扩散角度</td></tr>
+      <tr><td><span class="field">shootWarmup</span></td><td>数字</td><td>预热时间</td></tr>
+      <tr><td><span class="field">ammoPerShot</span></td><td>数字</td><td>每次消耗弹药数</td></tr>
+      <tr><td><span class="field">buildCost</span></td><td>对象</td><td>建造费用</td></tr>
+    </table>
+
+    <!-- ========== 物品 ========== -->
+    <h2>📦 物品 (Item)</h2>
+    <hr>
+
+    <div class="example">
+      <span class="field">type</span>: <span class="value">"Item"</span><br>
+      <span class="field">name</span>: <span class="value">"物品名称"</span><br>
+      <span class="field">flammability</span>: <span class="value">0.5</span>  <span class="desc">// 可燃性 0-1</span><br>
+      <span class="field">explosiveness</span>: <span class="value">0.8</span>  <span class="desc">// 爆炸性 0-1</span><br>
+      <span class="field">radioactivity</span>: <span class="value">0</span>  <span class="desc">// 放射性 0-1</span><br>
+      <span class="field">hardness</span>: <span class="value">3</span>  <span class="desc">// 硬度 0-10</span><br>
+      <span class="field">cost</span>: <span class="value">1</span>  <span class="desc">// 价值</span><br>
+      <span class="field">color</span>: <span class="value">"FF8800"</span>  <span class="desc">// 颜色 (16进制)</span>
+    </div>
+
+    <h3>📋 物品参数表</h3>
+    <table>
+      <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+      <tr><td><span class="field">flammability</span></td><td>数字</td><td>可燃性 0-1</td></tr>
+      <tr><td><span class="field">explosiveness</span></td><td>数字</td><td>爆炸性 0-1</td></tr>
+      <tr><td><span class="field">radioactivity</span></td><td>数字</td><td>放射性 0-1</td></tr>
+      <tr><td><span class="field">hardness</span></td><td>数字</td><td>硬度 0-10</td></tr>
+      <tr><td><span class="field">color</span></td><td>字符串</td><td>颜色 #RRGGBB</td></tr>
+    </table>
+
+    <!-- ========== 方块 ========== -->
+    <h2>🏗️ 方块 (Block)</h2>
+    <hr>
+
+    <div class="example">
+      <span class="field">type</span>: <span class="value">"Block"</span><br>
+      <span class="field">name</span>: <span class="value">"方块名称"</span><br>
+      <span class="field">health</span>: <span class="value">400</span><br>
+      <span class="field">size</span>: <span class="value">2</span><br>
+      <span class="field">buildCost</span>: <span class="value">{"copper": 50}</span><br>
+      <span class="field">solid</span>: <span class="value">true</span>  <span class="desc">// 是否实体</span><br>
+      <span class="field">buildTime</span>: <span class="value">60</span>  <span class="desc">// 建造时间</span>
+    </div>
+
+    <h3>🔌 电力方块 (PowerBlock)</h3>
+    <div class="example">
+      <span class="field">type</span>: <span class="value">"PowerBlock"</span><br>
+      <span class="field">name</span>: <span class="value">"发电机"</span><br>
+      <span class="field">powerProduction</span>: <span class="value">60</span>  <span class="desc">// 发电量</span><br>
+      <span class="field">powerCapacity</span>: <span class="value">10000</span>  <span class="desc">// 储电量</span>
+    </div>
+
+    <!-- ========== 单位 ========== -->
+    <h2>🔫 单位 (Unit)</h2>
+    <hr>
+
+    <div class="example">
+      <span class="field">type</span>: <span class="value">"Unit"</span><br>
+      <span class="field">name</span>: <span class="value">"单位名称"</span><br>
+      <span class="field">health</span>: <span class="value">200</span><br>
+      <span class="field">speed</span>: <span class="value">3</span>  <span class="desc">// 速度</span><br>
+      <span class="field">damage</span>: <span class="value">15</span>  <span class="desc">// 攻击力</span><br>
+      <span class="field">range</span>: <span class="value">10</span>  <span class="desc">// 攻击范围</span><br>
+      <span class="field">buildCost</span>: <span class="value">{"copper": 100}</span>
+    </div>
+
+    <!-- ========== 液体 ========== -->
+    <h2>💧 液体 (Liquid)</h2>
+    <hr>
+
+    <div class="example">
+      <span class="field">type</span>: <span class="value">"Liquid"</span><br>
+      <span class="field">name</span>: <span class="value">"液体名称"</span><br>
+      <span class="field">color</span>: <span class="value">"4488FF"</span><br>
+      <span class="field">temperature</span>: <span class="value">0.5</span>  <span class="desc">// 温度 0-1</span><br>
+      <span class="field">viscosity</span>: <span class="value">0.3</span>  <span class="desc">// 粘稠度 0-1</span>
+    </div>
+
+    <!-- ========== 数据格式 ========== -->
+    <h2>💡 数据格式</h2>
+    <hr>
+
+    <div class="tip">
+      <p>✅ <span class="field">数字</span>：直接写 <span class="value">800</span></p>
+      <p>✅ <span class="field">字符串</span>：加引号 <span class="value">"名称"</span></p>
+      <p>✅ <span class="field">布尔值</span>：<span class="value">true</span> / <span class="value">false</span></p>
+      <p>✅ <span class="field">数组</span>：<span class="value">["item1", "item2"]</span></p>
+      <p>✅ <span class="field">对象</span>：<span class="value">{"key": "value"}</span></p>
+    </div>
+
+    <!-- ========== 常见问题 ========== -->
+    <h2>❓ 常见问题</h2>
+    <hr>
+
+    <div class="warning">
+      <b>⚠️ 模组不显示？</b><br>
+      检查 mod.hjson 中的 <span class="field">minGameVersion</span> 是否 ≤ 你的游戏版本
+    </div>
+
+    <div class="warning">
+      <b>⚠️ 炮塔不攻击？</b><br>
+      检查是否有 <span class="field">range</span> 和 <span class="field">ammoType</span> 字段
+    </div>
+
+    <div class="tip">
+      <b>✅ 游戏版本号</b><br>
+      v146 → 146<br>
+      v147 → 147<br>
+      v7 → 7
+    </div>
+
+    <!-- ========== 感谢 ========== -->
+    <hr>
+    <p style="text-align:center;color:#888;font-size:12px;margin-top:30px;">
+      📖 帮助文档 v2.0 | 持续更新中
+    </p>
+
+  </body>
+</html>
