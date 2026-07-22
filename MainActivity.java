@@ -45,7 +45,7 @@ public class MainActivity extends Activity {
     private LinearLayout customFieldsContainer;
     private List<EditText[]> customFields = new ArrayList<>();
     private LinearLayout modListContainer;
-    // 在 MainActivity 类里面，其他变量旁边加
+    private boolean isGenerating = false;
     private static final int REQUEST_SELECT_ICON = 100;
     private String selectedIconPath = null;
     // ==================== 颜色方案 ====================
@@ -65,12 +65,12 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestPermissions();
-        Toast.makeText(this, "1", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "1", Toast.LENGTH_SHORT).show();
         modGenerator = new ModGenerator(this);
-        Toast.makeText(this, "2", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "2", Toast.LENGTH_SHORT).show();
         ScrollView scroll = createMainScrollView();
         LinearLayout root = createMainLayout();
-         Toast.makeText(this, "3", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, "3", Toast.LENGTH_SHORT).show();
         // 标题
         root.addView(createTitle());
         //Toast.makeText(this, "4", Toast.LENGTH_SHORT).show();
@@ -645,13 +645,51 @@ public class MainActivity extends Activity {
     }
 
     private void generateMod() {
+        // 防重复点击
+        if (isGenerating) {
+            Toast.makeText(this, "⏳ 正在生成中，请稍候", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 输入校验
+        String name = modName.getText().toString().trim();
+        if (name.isEmpty()) {
+            Toast.makeText(this, "❌ 模组名称不能为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!name.matches("^[a-zA-Z0-9\\-_]+$")) {
+            Toast.makeText(this, "❌ 模组名称只能包含字母、数字、下划线、连字符", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String display = displayName.getText().toString().trim();
+        if (display.isEmpty()) {
+            Toast.makeText(this, "❌ 显示名称不能为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String ver = version.getText().toString().trim();
+        if (ver.isEmpty()) {
+            Toast.makeText(this, "❌ 版本号不能为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String minVer = minGameVersion.getText().toString().trim();
+        if (minVer.isEmpty()) {
+            Toast.makeText(this, "❌ 最低游戏版本不能为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 开始生成
+        isGenerating = true;
+
         ModGenerator.ModConfig config = new ModGenerator.ModConfig();
-        config.name = modName.getText().toString().trim();
-        config.displayName = displayName.getText().toString().trim();
+        config.name = name;
+        config.displayName = display;
         config.author = author.getText().toString().trim();
         config.description = description.getText().toString().trim();
-        config.version = version.getText().toString().trim();
-        config.minGameVersion = minGameVersion.getText().toString().trim();
+        config.version = ver;
+        config.minGameVersion = minVer;
         config.contentType = contentType.getSelectedItem().toString();
 
         // 收集自定义字段
@@ -664,16 +702,23 @@ public class MainActivity extends Activity {
             }
         }
 
+        // 如果没有任何自定义字段，提示用户
+        if (config.customFields.isEmpty()) {
+            Toast.makeText(this, "⚠️ 请至少添加一个字段", Toast.LENGTH_SHORT).show();
+            isGenerating = false;
+            return;
+        }
+
         if (modGenerator.generateMod(config)) {
             // 复制图标
             if (selectedIconPath != null && !selectedIconPath.isEmpty()) {
                 modGenerator.copyIconToMod(config.name, selectedIconPath);
             }
             refreshModList();
-            Toast.makeText(this, 
-                           "✅ 模组已生成！\n请将图片放入 sprites/ 对应目录\n图片名需与 JSON 文件名一致", 
-                           Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "✅ 模组已生成！\n请将图片放入 sprites/ 对应目录", Toast.LENGTH_LONG).show();
         }
+
+        isGenerating = false;
     }
 
     private void packToZip() {
