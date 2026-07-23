@@ -1,5 +1,5 @@
 package com.mindustry.modgen;
-
+import android.net.Uri;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -37,7 +37,31 @@ import android.content.Intent;
  */
 
 public class MainActivity extends Activity {
-
+    private String selectedImagePath = null;
+    private String selectedImageName = null;
+    // 常用字段列表（字段名 → 中文解释）
+    private final String[][] COMMON_FIELDS = {
+        {"type", "类型"},
+        {"name", "名称"},
+        {"health", "血量"},
+        {"size", "尺寸"},
+        {"range", "射程"},
+        {"reload", "装填时间"},
+        {"shots", "弹丸数"},
+        {"shootCone", "射击角度"},
+        {"ammoType", "弹药类型"},
+        {"buildCost", "建造费用"},
+        {"flammability", "可燃性"},
+        {"explosiveness", "爆炸性"},
+        {"radioactivity", "放射性"},
+        {"hardness", "硬度"},
+        {"powerProduction", "发电量"},
+        {"powerCapacity", "储电量"},
+        {"speed", "速度"},
+        {"damage", "伤害"},
+        {"bulletSpeed", "弹丸速度"},
+        {"range", "射程"}
+    };
     // UI 组件
     private EditText modName, displayName, author, description, version, minGameVersion;
     private Spinner contentType;
@@ -106,16 +130,7 @@ public class MainActivity extends Activity {
         refreshModList();
          //Toast.makeText(this, "13", Toast.LENGTH_SHORT).show();
     }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_SELECT_ICON && resultCode == RESULT_OK) {
-            if (data != null && data.getData() != null) {
-                selectedIconPath = data.getData().toString();
-                Toast.makeText(this, "✅ 图标已选择", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+
     private void requestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -217,6 +232,121 @@ public class MainActivity extends Activity {
 
         return card;
         
+    } 
+    private void addCustomField(String key, String value) {
+        final LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(0, 4, 0, 4);
+
+        // 字段名输入框
+        final EditText etKey = new EditText(this);
+        etKey.setHint("字段名");
+        etKey.setText(key);
+        etKey.setTextSize(13);
+        etKey.setTextColor(COLOR_TEXT);
+        etKey.setHintTextColor(COLOR_TEXT_SECONDARY);
+        etKey.setBackgroundColor(COLOR_CARD_LIGHT);
+        etKey.setPadding(12, 10, 12, 10);
+
+        // 下拉按钮（▼）
+        Button btnDropdown = new Button(this);
+        btnDropdown.setText("▼");
+        btnDropdown.setTextColor(COLOR_TEXT);
+        btnDropdown.setBackgroundColor(COLOR_CARD_LIGHT);
+        btnDropdown.setPadding(8, 8, 8, 8);
+        btnDropdown.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showFieldDropdown(etKey);
+                }
+            });
+
+        // 值输入框
+        final EditText etValue = new EditText(this);
+        etValue.setHint("值");
+        etValue.setText(value);
+        etValue.setTextSize(13);
+        etValue.setTextColor(COLOR_TEXT);
+        etValue.setHintTextColor(COLOR_TEXT_SECONDARY);
+        etValue.setBackgroundColor(COLOR_CARD_LIGHT);
+        etValue.setPadding(12, 10, 12, 10);
+
+        // 选图按钮（🖼️），默认隐藏
+        final Button btnImage = new Button(this);
+        btnImage.setText("🖼️");
+        btnImage.setTextColor(COLOR_TEXT);
+        btnImage.setBackgroundColor(COLOR_CARD_LIGHT);
+        btnImage.setPadding(8, 8, 8, 8);
+        btnImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectImageForField(etValue, etKey);
+                }
+            });
+        btnImage.setVisibility(View.GONE);
+
+        // 监听字段名变化，只有字段名是 "name" 时才显示选图按钮
+        etKey.addTextChangedListener(new android.text.TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(android.text.Editable s) {
+                    if (s.toString().trim().equals("name")) {
+                        btnImage.setVisibility(View.VISIBLE);
+                    } else {
+                        btnImage.setVisibility(View.GONE);
+                    }
+                }
+            });
+
+        // 删除按钮（✕）
+        Button btnDel = new Button(this);
+        btnDel.setText("✕");
+        btnDel.setTextColor(Color.WHITE);
+        btnDel.setTextSize(16);
+        btnDel.setBackgroundColor(COLOR_ACCENT_DARK);
+        btnDel.setPadding(16, 8, 16, 8);
+        btnDel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    customFieldsContainer.removeView(row);
+                    customFields.remove(new EditText[]{etKey, etValue});
+                }
+            });
+
+        // 布局参数
+        LinearLayout.LayoutParams dropdownLp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        dropdownLp.setMargins(0, 0, 4, 0);
+
+        LinearLayout.LayoutParams keyLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.5f);
+        keyLp.setMargins(0, 0, 8, 0);
+
+        LinearLayout.LayoutParams valueLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 2f);
+        valueLp.setMargins(0, 0, 4, 0);
+
+        LinearLayout.LayoutParams imageLp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        imageLp.setMargins(0, 0, 4, 0);
+
+        LinearLayout.LayoutParams delLp = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        row.addView(btnDropdown, dropdownLp);
+        row.addView(etKey, keyLp);
+        row.addView(etValue, valueLp);
+        row.addView(btnImage, imageLp);
+        row.addView(btnDel, delLp);
+
+        customFieldsContainer.addView(row);
+        customFields.add(new EditText[]{etKey, etValue});
     }
    /**
      * 创建自定义字段卡片
@@ -414,58 +544,7 @@ public class MainActivity extends Activity {
 
     */
     
-    private void addCustomField(String key, String value) {
-        final LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setPadding(0, 4, 0, 4);
 
-        final EditText etKey = new EditText(this);
-        etKey.setHint("字段名");
-        etKey.setText(key);
-        etKey.setTextSize(13);
-        etKey.setTextColor(COLOR_TEXT);
-        etKey.setHintTextColor(COLOR_TEXT_SECONDARY);
-        etKey.setBackgroundColor(COLOR_CARD_LIGHT);
-        etKey.setPadding(12, 10, 12, 10);
-
-        final EditText etValue = new EditText(this);
-        etValue.setHint("值");
-        etValue.setText(value);
-        etValue.setTextSize(13);
-        etValue.setTextColor(COLOR_TEXT);
-        etValue.setHintTextColor(COLOR_TEXT_SECONDARY);
-        etValue.setBackgroundColor(COLOR_CARD_LIGHT);
-        etValue.setPadding(12, 10, 12, 10);
-
-        Button btnDel = new Button(this);
-        btnDel.setText("✕");
-        btnDel.setTextColor(Color.WHITE);
-        btnDel.setTextSize(16);
-        btnDel.setBackgroundColor(COLOR_ACCENT_DARK);
-        btnDel.setPadding(16, 8, 16, 8);
-        btnDel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    customFieldsContainer.removeView(row);
-                    customFields.remove(new EditText[]{etKey, etValue});
-                }
-            });
-
-        LinearLayout.LayoutParams keyLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 2f);
-        keyLp.setMargins(0, 0, 8, 0);
-        LinearLayout.LayoutParams valueLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 3f);
-        valueLp.setMargins(0, 0, 8, 0);
-        LinearLayout.LayoutParams delLp = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-
-        row.addView(etKey, keyLp);
-        row.addView(etValue, valueLp);
-        row.addView(btnDel, delLp);
-
-        customFieldsContainer.addView(row);
-        customFields.add(new EditText[]{etKey, etValue});
-    }
     private void selectIcon() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("image/*");
@@ -643,7 +722,65 @@ public class MainActivity extends Activity {
 
         return item;
     }
+    // 显示常用字段下拉列表
+    private void showFieldDropdown(final EditText targetField) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("📋 选择常用字段");
 
+        // 构建带解释的列表
+        String[] fieldNames = new String[COMMON_FIELDS.length];
+        for (int i = 0; i < COMMON_FIELDS.length; i++) {
+            fieldNames[i] = COMMON_FIELDS[i][0] + "  (" + COMMON_FIELDS[i][1] + ")";
+        }
+
+        builder.setItems(fieldNames, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // 只填入字段名
+                    targetField.setText(COMMON_FIELDS[which][0]);
+                }
+            });
+
+        builder.setNegativeButton("取消", null);
+        builder.show();
+    }
+    private EditText pendingImageValue = null;
+    private EditText pendingImageKey = null;
+
+            private void selectImageForField(final EditText valueField, final EditText keyField) {
+            pendingImageValue = valueField;
+            pendingImageKey = keyField;
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.setType("image/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            startActivityForResult(intent, REQUEST_SELECT_ICON);
+            }
+    private void copyImageToSprites(String modName, String subDir, String imagePath, String imageName) {
+        try {
+            File dir = modGenerator.getModDirectory(modName);
+            File spritesDir = new File(dir, "sprites");
+            spritesDir.mkdirs();
+
+            File targetDir = new File(spritesDir, subDir);
+            targetDir.mkdirs();
+
+            File targetFile = new File(targetDir, imageName);
+
+            InputStream is = getContentResolver().openInputStream(Uri.parse(imagePath));
+            FileOutputStream fos = new FileOutputStream(targetFile);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                fos.write(buffer, 0, length);
+            }
+            fos.close();
+            is.close();
+
+        } catch (Exception e) {
+            Toast.makeText(this, "⚠️ 图片复制失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
     private void generateMod() {
         // 防重复点击
         if (isGenerating) {
@@ -714,10 +851,16 @@ public class MainActivity extends Activity {
             if (selectedIconPath != null && !selectedIconPath.isEmpty()) {
                 modGenerator.copyIconToMod(config.name, selectedIconPath);
             }
-            refreshModList();
-            Toast.makeText(this, "✅ 模组已生成！\n请将图片放入 sprites/ 对应目录", Toast.LENGTH_LONG).show();
-        }
 
+            // 复制选中的图片到 sprites/
+            if (selectedImagePath != null && !selectedImagePath.isEmpty() && selectedImageName != null) {
+                String subDir = modGenerator.getContentSubDir(config.contentType);
+                copyImageToSprites(config.name, subDir, selectedImagePath, selectedImageName);
+            }
+
+            refreshModList();
+            Toast.makeText(this, "✅ 模组已生成！\n图片已放入 sprites/ 对应目录", Toast.LENGTH_LONG).show();
+        }
         isGenerating = false;
     }
 
@@ -785,6 +928,41 @@ public class MainActivity extends Activity {
                 }
             });
         builder.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_SELECT_ICON && resultCode == RESULT_OK) {
+            if (data != null && data.getData() != null) {
+                Uri imageUri = data.getData();
+
+                if (pendingImageValue != null && pendingImageKey != null) {
+                    // 获取 key 字段的值作为文件名
+                    String keyName = pendingImageKey.getText().toString().trim();
+                    if (keyName.isEmpty()) {
+                        keyName = "image";
+                    }
+                    String fileName = keyName + ".png";
+
+                    // 填入值字段
+                    pendingImageValue.setText(fileName);
+
+                    // 保存路径供生成时复制
+                    selectedImagePath = imageUri.toString();
+                    selectedImageName = fileName;
+
+                    pendingImageValue = null;
+                    pendingImageKey = null;
+                    Toast.makeText(this, "✅ 图片已选择: " + fileName, Toast.LENGTH_SHORT).show();
+
+                } else {
+                    // 模组图标
+                    selectedIconPath = imageUri.toString();
+                    Toast.makeText(this, "✅ 图标已选择", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
     @Override
     public void onBackPressed() {
